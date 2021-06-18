@@ -1,2 +1,2 @@
-# vagrant
-Vagrant files
+# Vagrant
+Vagrant files for local development scenarios
