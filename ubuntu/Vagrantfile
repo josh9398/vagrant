@@ -78,4 +78,15 @@ Vagrant.configure(2) do |config|
 
   # Restart
   config.vm.provision :shell, inline: "sudo shutdown -r now"
+
+  # Install snapd
+  config.vm.provision :shell, run: "always", inline: "sudo apt install snapd"
+  config.vm.provision :shell, run: "always", inline: "sudo snap install core"
+
+  # Install code
+  config.vm.provision :shell, run: "always", inline: "sudo snap install --classic code"
+
+  # Install code extensions
+  config.vm.provision :shell, run: "always", inline: "code --install-extension golang.go"
+  config.vm.provision :shell, run: "always", inline: "code --install-extension ms-python.python"
 end

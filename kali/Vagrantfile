@@ -47,4 +47,15 @@ Vagrant.configure(2) do |config|
   # Currently "ubuntu/bionic64" on VirtualBox requires `type: "virtualbox"`
   # to make synced folder works.
   config.vm.synced_folder ".", "/vagrant", type: "virtualbox", automount: true
+
+  # Install snapd
+  config.vm.provision :shell, run: "always", inline: "sudo apt install snapd"
+  config.vm.provision :shell, run: "always", inline: "sudo snap install core"
+
+  # Install code
+  config.vm.provision :shell, run: "always", inline: "sudo snap install --classic code"
+
+  # Install code extensions
+  config.vm.provision :shell, run: "always", inline: "code --install-extension golang.go"
+  config.vm.provision :shell, run: "always", inline: "code --install-extension ms-python.python"
 end
