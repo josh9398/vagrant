@@ -1,0 +1,51 @@
+box_version = "4.11.2"
+ssh_key_name = "id_rsa"
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "stuxcd/parrot-security"
+  config.vm.box_version = box_version
+  config.vm.box_check_update = true
+  config.vm.guest = "linux"
+
+  required_plugins = %w( vagrant-vbguest )
+  _retry = false
+  required_plugins.each do |plugin|
+    unless Vagrant.has_plugin? plugin
+      system "vagrant plugin install #{plugin}"
+      _retry=true
+    end
+  end
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = false
+    vb.name = "Parrot Security #{box_version}"
+    vb.memory = 8192
+    vb.cpus = 6
+    vb.check_guest_additions = true
+    vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
+    vb.customize ["modifyvm", :id, "--vram", "128"]
+    vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+  end
+
+  config.vm.network "forwarded_port", 
+    guest: 22, 
+    host: 2222
+
+  if Vagrant::Util::Platform.windows? then
+    config.vm.provision "file", source: "#{ENV['HOME']}\\.ssh\\#{ssh_key_name}", destination: "/tmp/#{ssh_key_name}", run: "always"
+    config.vm.provision "file", source: "#{ENV['HOME']}\\.ssh\\#{ssh_key_name}.pub", destination: "/tmp/#{ssh_key_name}.pub", run: "always"
+  else
+    config.vm.provision "file", source: "#{ENV['HOME']}//.ssh//#{ssh_key_name}", destination: "/tmp/#{ssh_key_name}", run: "always"
+    config.vm.provision "file", source: "#{ENV['HOME']}//.ssh//#{ssh_key_name}.pub", destination: "/tmp/#{ssh_key_name}.pub", run: "always"
+  end
+
+  # SSH access
+  config.vm.provision :shell, run: "always", inline: "mv /tmp/#{ssh_key_name}* /home/vagrant/.ssh"
+  config.vm.provision :shell, run: "always", inline: "chmod 0400 /home/vagrant/.ssh/#{ssh_key_name}"
+  # TODO avoid duplicates
+  config.vm.provision :shell, run: "always", inline: "cat /home/vagrant/.ssh/#{ssh_key_name}.pub \>\> /home/vagrant/.ssh/authorized_keys"
+
+  # Currently "ubuntu/bionic64" on VirtualBox requires `type: "virtualbox"`
+  # to make synced folder works.
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox", automount: true
+end
