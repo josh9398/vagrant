@@ -50,13 +50,15 @@ Vagrant.configure(2) do |config|
 
   # Install snapd
   config.vm.provision :shell, run: "always", inline: "sudo apt install snapd"
+  config.vm.provision :shell, run: "always", inline: "sudo systemctl enable snapd && sudo systemctl start snapd"
   config.vm.provision :shell, run: "always", inline: "sudo snap install core"
+  config.vm.provision :shell, run: "always", inline: "echo export PATH=$PATH:/snap/bin >> /home/vagrant/.profile"
 
   # Install code
   config.vm.provision :shell, run: "always", inline: "sudo snap install --classic code"
 
   # Install code extensions
-  config.vm.provision :shell, run: "always", inline: "code --install-extension golang.go"
-  config.vm.provision :shell, run: "always", inline: "code --install-extension ms-python.python"
-  config.vm.provision :shell, run: "always", inline: "code --install-extension 4ops.terraform"
+  config.vm.provision :shell, run: "always", inline: "/snap/bin/code --install-extension golang.go"
+  config.vm.provision :shell, run: "always", inline: "/snap/bin/code --install-extension ms-python.python"
+  config.vm.provision :shell, run: "always", inline: "/snap/bin/code --install-extension 4ops.terraform"
 end
