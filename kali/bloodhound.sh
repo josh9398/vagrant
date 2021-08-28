@@ -2,6 +2,8 @@
 
 # Source and docs: https://bloodhound.readthedocs.io/en/latest/installation/linux.html
 
+# Install npm
+
 # Install noe4j
 echo "deb http://httpredir.debian.org/debian stretch-backports main" | sudo tee -a /etc/apt/sources.list.d/stretch-backports.list
 sudo apt-get update
@@ -19,6 +21,8 @@ sudo npm install -g electron-packager
 
 cd tools/Bloodhound
 npm install
-npm run linuxbuild
+#npm run linuxbuild
 cd -
 
+sudo systemctl disable neo4j
+sudo systemctl stop noe4j

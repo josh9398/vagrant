@@ -18,7 +18,7 @@ Vagrant.configure(2) do |config|
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
     vb.name = "Kali #{box_version}"
-    vb.memory = 8192
+    vb.memory = 6144
     vb.cpus = 6
     vb.check_guest_additions = true
     vb.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
@@ -39,34 +39,28 @@ Vagrant.configure(2) do |config|
   end
 
   # SSH access
-  config.vm.provision :shell, inline: "mv /tmp/#{ssh_key_name}* /home/vagrant/.ssh"
-  config.vm.provision :shell, inline: "chmod 0400 /home/vagrant/.ssh/#{ssh_key_name}"
-  config.vm.provision :shell, inline: "cp /home/vagrant/.ssh/#{ssh_key_name}.pub /home/vagrant/.ssh/authorized_keys"
+  config.vm.provision :shell, run: "always", inline: "mv /tmp/#{ssh_key_name}* /home/vagrant/.ssh"
+  config.vm.provision :shell, run: "always", inline: "chmod 0400 /home/vagrant/.ssh/#{ssh_key_name}"
+  config.vm.provision :shell, run: "always", inline: "cp /home/vagrant/.ssh/#{ssh_key_name}.pub /home/vagrant/.ssh/authorized_keys"
 
   # Currently "ubuntu/bionic64" on VirtualBox requires `type: "virtualbox"`
   # to make synced folder works.
   config.vm.synced_folder ".", "/vagrant", type: "virtualbox", automount: true
 
   # Install snapd
-  config.vm.provision :shell, inline: "sudo apt install snapd"
-  config.vm.provision :shell, inline: "sudo systemctl enable snapd && sudo systemctl start snapd"
-  config.vm.provision :shell, inline: "sudo snap install core"
-  config.vm.provision :shell, inline: "echo export PATH=$PATH:/snap/bin >> /home/vagrant/.profile"
+  config.vm.provision :shell, inline: "apt install snapd"
+  config.vm.provision :shell, inline: "systemctl enable snapd && systemctl start snapd"
+  config.vm.provision :shell, inline: "snap install core"
+  config.vm.provision :shell, privileged: false, inline: "echo export PATH=$PATH:/snap/bin >> /home/vagrant/.profile"
 
   # Install code
-  config.vm.provision :shell, inline: "sudo snap install --classic code"
+  config.vm.provision :shell, inline: "snap install --classic code"
 
   # Install repos
-  config.vm.provision :shell, inline: "mkdir tools"
-  config.vm.provision :shell, inline: "git clone git@github.com:SecureAuthCorp/impacket.git tools/impacket"
-  config.vm.provision :shell, inline: "git clone git@github.com:Hackplayers/evil-winrm.git tools/evil-winrm"
-  config.vm.provision :shell, inline: "git clone git@github.com:danielmiessler/SecLists.git tools/SecLists"
-  config.vm.provision :shell, inline: "git clone https://github.com/BloodHoundAD/Bloodhound tools/Bloodhound"
-
-  # Install npm major version 16
-  config.vm.provision :shell, inline: "sudo snap install --classic --channel=16 node"
-
-  # Install noe4j bloodhound
-  config.vm.provision :shell, path: "bloodhound.sh"
+  config.vm.provision :shell, privileged: false, inline: "mkdir tools"
+  config.vm.provision :shell, privileged: false, inline: "GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\" git clone git@github.com:SecureAuthCorp/impacket.git tools/impacket"
+  config.vm.provision :shell, privileged: false, inline: "GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\" git clone git@github.com:Hackplayers/evil-winrm.git tools/evil-winrm"
+  config.vm.provision :shell, privileged: false, inline: "GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\" git clone git@github.com:danielmiessler/SecLists.git tools/SecLists"
+  config.vm.provision :shell, privileged: false, inline: "GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\" git clone git@github.com:BloodHoundAD/BloodHound.git tools/Bloodhound"
 
 end
