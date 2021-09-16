@@ -48,7 +48,7 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder ".", "/vagrant", type: "virtualbox", automount: true
 
   # Install snapd
-  config.vm.provision :shell, inline: "apt install snapd"
+  config.vm.provision :shell, inline: "apt install -y snapd"
   config.vm.provision :shell, inline: "systemctl enable snapd && systemctl start snapd"
   config.vm.provision :shell, inline: "snap install core"
   config.vm.provision :shell, privileged: false, inline: "echo export PATH=$PATH:/snap/bin >> /home/vagrant/.profile"
@@ -62,5 +62,8 @@ Vagrant.configure(2) do |config|
   config.vm.provision :shell, privileged: false, inline: "GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\" git clone git@github.com:Hackplayers/evil-winrm.git tools/evil-winrm"
   config.vm.provision :shell, privileged: false, inline: "GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\" git clone git@github.com:danielmiessler/SecLists.git tools/SecLists"
   config.vm.provision :shell, privileged: false, inline: "GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\" git clone git@github.com:BloodHoundAD/BloodHound.git tools/Bloodhound"
+
+  # Install tools
+  config.vm.provision :shell, inline: "apt install -y smtp-user-enum"
 
 end
