@@ -1,4 +1,4 @@
-box_version = "2021.2.0"
+box_version = "2021.4.0"
 ssh_key_name = 'id_rsa'
 
 Vagrant.configure(2) do |config|
